@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TODOS</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .todo_title {
+            text-align: center;
+            font-size: 30pt;
+            font-weight: bold;
+            color: green;
+        
+        }
+        .todo_box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .todo_list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+        }
+        .todo_item {
+            display: flex;  
+        }
+
+    </style>
+</head>
+<body>
+    <div class="todo_title">TODOS</div>
+
+    <div class="todo_box">
+        <div class="todo_box_input">
+            <input type="text" class="todo_input" 
+            placeholder="할 일을 추가해주세요" 
+            style="height: 30pt; width: 300pt; color: gray;font-size: 15pt;">
+            <button class="addBtn">+</button>
+        </div>
+
+        <ul class="todo_list">
+            <!-- 완료된 일 -->
+            <!-- <li class="todo_item">
+                <div class="checkbox">v<div>
+                <div calss="todo"></div>
+                <button class="delBtn">x</button>
+            </li> -->
+            <!-- 미완료 -->
+            <!-- <li calss="todo_item">
+                <div class="checkbox"></div>
+                <div class="todo"></div>
+                <button class="delBtn">x</button>
+            </li> -->
+        </ul>
+    </div>
+    <div class="filter_box">
+        <button class="filter" data_kind="all">All</button>
+        <button class="filter" data_kind="todo">Todo</button>
+        <button class="filter" data_kind="completed">Completed</button>
+    </div>
+    <script>
+        async function getData() {
+            let data = await fetch('https://jsonplaceholder.typicode.com/todos/').then(res => res.json()).then(result => result)
+            // console.log(data[0].title, data[0].completed)
+            return data
+        }
+        
+        getData()
+
+        // function createList(title) {
+        //     let li = document.createElement('li')
+        //     li.innerHTML = `
+        //         <input type='checkbox'>
+        //         <div>${title}<div>
+        //         <button>x</button>
+        //     `
+        //     return li
+        // }
+
+    
+        const todoInputElem = document.querySelector('.todo_input')
+        let todos = [];
+        // let id = 0;
+        // 할 일의 구조
+        // {userId: stiring, id: number, Completed: boolean, content: string}
+
+        // 특정 DOM요소에 이벤트 리스터를 등록할 때는 addEventListener를 사용
+        // DOM객체.addEventListener(이벤트명, 실행할 함수명, 옵션)
+        const init = function() {
+            // 기존 데이터 불러 오는 함수
+            priorData()
+            // 데이터 입력
+            todoInputElem.addEventListener('keypress', function(event) {
+                if (event.keyCode === 13) {
+                    appendTodos(event.target.value, 'enter');
+                    todoInputElem.value = '';
+                }
+            })
+            const addBtn = document.querySelector('.addBtn')
+            addBtn.addEventListener('click', function(){
+                appendTodos()
+                todoInputElem.value = '';
+            })
+            // setFilter()
+        }
+        init()
+        // 기존 할 일 목록 불러오는 함수
+        const getAlltodos = function() {
+            return todos
+        }
+        // 추가한 목록으로 업데이트
+        const setTodos = function(newTodos) {
+            return todos = newTodos
+        }
+        // 목록 추가하는 함수
+        const appendTodos = function(title, enter) {
+            const priorList = document.querySelectorAll('.todo_item')
+            // parseInt: 문자열을 숫자타입으로 바꿔주는 것
+            const newId = parseInt(priorList[priorList.length - 1].id) + 1
+            const todo = {id: newId, title: todoInputElem.value, completed: false}
+            paintTodos(todo)
+        }
+        // 기존 데이터 불러 오는 함수
+        async function priorData() {
+            let data = await fetch('https://jsonplaceholder.typicode.com/todos/').then(res => res.json()).then(result => result)
+            // console.log(data)
+            data.forEach(function(data) {
+                paintTodos(data)
+            })
+        }
+
+        const paintTodos = function(todo) {
+            const todoListElem = document.querySelector('.todo_list')
+            const todoItemElem = document.createElement('li')
+            todoItemElem.classList.add('todo_item')
+            todoItemElem.id = `${todo.id}`
+
+            const checkboxElem = document.createElement('div')
+            checkboxElem.classList.add('checkbox')
+            // todo.completed가 true이면 ckeck, false면 공란
+            checkboxElem.innerHTML = `<input type = "checkbox" ${todo.completed ? 'checked' : ''}>`
+
+            const todoElem = document.createElement('div')
+            todoElem.classList.add('todo')
+            todoElem.innerText = todo.title
+
+            const delBtnElem = document.createElement('button')
+            delBtnElem.classList.add('delBtn')
+            delBtnElem.innerHTML = 'x'
+            delBtnElem.addEventListener('click', function(event) {
+                // console.log(event.target)
+                event.target.parentElement.remove()
+        })
+
+            todoItemElem.appendChild(checkboxElem)
+            todoItemElem.appendChild(todoElem)
+            todoItemElem.appendChild(delBtnElem)
+
+            todoListElem.appendChild(todoItemElem)
+        // const todoInput = document.querySelector('.todo_input')
+        
+        }
+        // function setFilter() {
+        //     switch():
+        //         case 'All':
+        //             const All = document.querySelectorAll
+        //             break
+        //         case 'Active':
+        //             break
+        //         case 'Completed':
+        //             break
+        //     setUtemCount();
+        // }
+    </script>
+</body>
+</html>
